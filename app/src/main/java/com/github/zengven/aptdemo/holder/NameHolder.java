@@ -16,17 +16,15 @@ import com.github.zengven.aptdemo.bean.NameBean;
 
 public class NameHolder extends BaseViewHolder<NameBean> {
 
-    private final TextView mMTextView;
-
     public NameHolder(View itemView) {
         super(itemView);
-        mMTextView = (TextView) findViewById(R.id.text1);
     }
 
     @Override
     public void onBind(NameBean bean) {
-        mMTextView.setText(bean.name);
-        mMTextView.setOnClickListener(new View.OnClickListener() {
+        TextView textView = getView(R.id.text1);
+        textView.setText(bean.name);
+        textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(v.getContext(), "戳你--" + bean.name, Toast.LENGTH_SHORT).show();

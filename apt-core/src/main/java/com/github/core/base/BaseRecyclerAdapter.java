@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -64,7 +65,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseVi
      *
      * @param collection The Collection to add at the end of the array.
      */
-    public void addAll(@NonNull List<? extends T> collection) {
+    public void addAll(@NonNull Collection<? extends T> collection) {
         synchronized (mLock) {
             mObjects.addAll(collection);
         }
@@ -76,7 +77,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseVi
      *
      * @param collection The Collection to add at the end of the array.
      */
-    public void addAll(@NonNull List<? extends T> collection, int index) {
+    public void addAll(@NonNull Collection<? extends T> collection, int index) {
         synchronized (mLock) {
             mObjects.addAll(index, collection);
         }

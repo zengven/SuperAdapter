@@ -10,6 +10,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -93,7 +94,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
      *
      * @param collection The Collection to add at the end of the array.
      */
-    public void addAll(@NonNull List<? extends T> collection) {
+    public void addAll(@NonNull Collection<? extends T> collection) {
         synchronized (mLock) {
             if (mOriginalValues != null) {
                 mOriginalValues.addAll(collection);
@@ -109,7 +110,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
      *
      * @param collection The Collection to add at the end of the array.
      */
-    public void addAll(@NonNull List<? extends T> collection, int index) {
+    public void addAll(@NonNull Collection<? extends T> collection, int index) {
         synchronized (mLock) {
             if (mOriginalValues != null) {
                 mOriginalValues.addAll(index, collection);
