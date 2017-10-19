@@ -250,26 +250,26 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
     public
     @NonNull
     View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        BaseListViewHolder baseViewHolder = null;
+        BaseViewHolder baseViewHolder = null;
         if (convertView == null) {
             baseViewHolder = onCreateViewHolder(parent, getLayoutIds()[getItemViewType(position)], getItemViewType(position));
             convertView = baseViewHolder.itemView;
             convertView.setTag(baseViewHolder);
         } else {
-            baseViewHolder = (BaseListViewHolder) convertView.getTag();
+            baseViewHolder = (BaseViewHolder) convertView.getTag();
         }
         baseViewHolder.onBind(getItem(position));
         return convertView;
     }
 
-    private BaseListViewHolder onCreateViewHolder(ViewGroup parent, int layoutId, int viewType) {
+    private BaseViewHolder onCreateViewHolder(ViewGroup parent, int layoutId, int viewType) {
         if (mInflater == null)
             mInflater = LayoutInflater.from(parent.getContext());
         View itemView = mInflater.inflate(layoutId, parent, false);
         return createViewHolder(viewType, itemView);
     }
 
-    protected abstract BaseListViewHolder createViewHolder(int viewType, View itemView);
+    protected abstract BaseViewHolder createViewHolder(int viewType, View itemView);
 
     protected abstract int[] getLayoutIds();
 
@@ -337,9 +337,21 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
                     final T value = values.get(i);
 
                     // First match against the whole, non-splitted value
-                    T filter = BaseListAdapter.this.valueFilter(prefixString, value);
-                    if (null != filter) {
-                        newValues.add(filter);
+//                    T filter = BaseListAdapter.this.valueFilter(prefixString, value);
+//                    if (null != filter) {
+//                        newValues.add(filter);
+//                    }
+                    final String valueText = value.toString().toLowerCase();
+                    if (valueText.startsWith(prefixString)) {
+                        newValues.add(value);
+                    } else {
+                        final String[] words = valueText.split(" ");
+                        for (String word : words) {
+                            if (word.startsWith(prefixString)) {
+                                newValues.add(value);
+                                break;
+                            }
+                        }
                     }
                 }
 
@@ -359,11 +371,6 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
             } else {
                 notifyDataSetInvalidated();
             }
-        }
-
-        @Override
-        public CharSequence convertResultToString(Object resultValue) {
-            return BaseListAdapter.this.convertResultToString(resultValue);
         }
     }
 
@@ -387,18 +394,5 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
             }
         }
         return null;
-    }
-
-    /**
-     * <p>Converts a value from the filtered set into a CharSequence. Subclasses
-     * should override this method to convert their results. The default
-     * implementation returns an empty String for null values or the default
-     * String representation of the value.</p>
-     *
-     * @param resultValue the value to convert to a CharSequence
-     * @return a CharSequence representing the value
-     */
-    public CharSequence convertResultToString(Object resultValue) {
-        return resultValue == null ? "" : resultValue.toString();
     }
 }

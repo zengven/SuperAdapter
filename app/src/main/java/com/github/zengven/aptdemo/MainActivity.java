@@ -38,7 +38,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_recycler_multi:
-                startActivity(new Intent(getApplicationContext(), RecyclerActivity.class));
+                Intent intent = new Intent(getApplicationContext(), RecyclerActivity.class);
+                intent.putExtra("type", 1);
+                startActivity(intent);
                 break;
 
             case R.id.btn_list_single:
@@ -46,7 +48,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btn_list_multi:
-                startActivity(new Intent(getApplicationContext(), ListActivity.class));
+                Intent intent1 = new Intent(getApplicationContext(), ListActivity.class);
+                intent1.putExtra("type", 1);
+                startActivity(intent1);
                 break;
         }
     }

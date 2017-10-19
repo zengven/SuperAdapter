@@ -1,5 +1,6 @@
 package com.github.zengven.aptdemo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 public class ListActivity extends AppCompatActivity {
 
     @Adapter(data = "NameBean",
-            viewHolderClassName = {"NameListHolder", "NameListHolder"},
+            viewHolderClassName = {"NameHolder", "NameHolder"},
             layoutIds = {R.layout.simple_list_item_1, R.layout.simple_list_item_2})
     ListView mLvName;
 
@@ -22,19 +23,23 @@ public class ListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        Intent intent = getIntent();
+        int type = intent.getIntExtra("type", 0);
         mLvName = (ListView) findViewById(R.id.lv_name);
         SuperAdapter.bind(this);
         BaseListAdapter listAdapter = (BaseListAdapter) mLvName.getAdapter();
-        listAdapter.setOnViewTypeListener(new BaseListAdapter.OnViewTypeListener<NameBean>() {
+        if (type != 0) {
+            listAdapter.setOnViewTypeListener(new BaseListAdapter.OnViewTypeListener<NameBean>() {
 
-            @Override
-            public int onViewType(NameBean nameBean) {
-                if (nameBean.name.equals("小黑") || nameBean.name.equals("小样")) {
-                    return 1;
+                @Override
+                public int onViewType(NameBean nameBean) {
+                    if (nameBean.name.equals("小黑") || nameBean.name.equals("小样")) {
+                        return 1;
+                    }
+                    return 0;
                 }
-                return 0;
-            }
-        });
+            });
+        }
         ArrayList<NameBean> list = new ArrayList<>();
         list.add(new NameBean("小明"));
         list.add(new NameBean("小黑"));
