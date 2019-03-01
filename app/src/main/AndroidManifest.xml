@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.github.zengven.aptdemo">
+          package="com.yexin.zengven.aptdemo">
 
     <application
         android:allowBackup="true"
@@ -9,16 +9,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.github.zengven.aptdemo.MainActivity">
+        <activity android:name="com.yexin.zengven.aptdemo.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.github.zengven.aptdemo.RecyclerActivity">
+        <activity android:name="com.yexin.zengven.aptdemo.RecyclerActivity">
         </activity>
-        <activity android:name="com.github.zengven.aptdemo.ListActivity">
+        <activity android:name="com.yexin.zengven.aptdemo.ListActivity">
         </activity>
     </application>
 

@@ -15,7 +15,6 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 includeCompileClasspath true
-                classNames = ['com.github.AdapterProcessor']
             }
         }
     }

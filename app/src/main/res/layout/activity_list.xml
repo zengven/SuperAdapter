@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.github.zengven.aptdemo.ListActivity">
+    tools:context="com.yexin.zengven.aptdemo.ListActivity">
 
     <ListView
         android:id="@+id/lv_name"
