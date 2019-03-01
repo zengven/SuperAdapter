@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * author: zengven
  * date: 2017/6/16 15:14
- * desc: 轮播图 适配器基类
+ * desc: base pager adapter
  */
 public abstract class BasePagerAdapter<T> extends PagerAdapter {
     /**

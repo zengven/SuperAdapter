@@ -109,6 +109,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
      * Adds the specified Collection at the specified index in the array.
      *
      * @param collection The Collection to add at the end of the array.
+     * @param index
      */
     public void addAll(@NonNull Collection<? extends T> collection, int index) {
         synchronized (mLock) {
@@ -191,7 +192,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
     }
 
     /**
-     * Control whether methods that change the list ({@link #add}, {@link #addAll(List)},
+     * Control whether methods that change the list ({@link #add}
      * {@link #addAll(Object[])}, {@link #add(Object, int)}, {@link #remove}, {@link #clear},
      * {@link #sort(Comparator)}) automatically call {@link #notifyDataSetChanged}.  If set to
      * false, caller must manually call notifyDataSetChanged() to have the changes
@@ -275,8 +276,9 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
     protected abstract int[] getLayoutIds();
 
     /**
-     * @param t
-     * @return 必须为LayoutIds对于的角标
+     * @param t        generic parameter
+     * @param position current item position
+     * @return must be the layout resource id
      */
     public abstract int getViewType(T t, int position);
 
@@ -376,7 +378,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter implements Filterab
     }
 
     /**
-     * 输入过滤器
+     * input value filter
      *
      * @param prefixString
      * @param value

@@ -14,10 +14,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * @author yuhushuan@le.com
- * @ClassName: BaseRecyclerAdapter
- * @Description: 多类型适配器
- * @date 2017/3/17 20:34
+ * author: zengven
+ * date: 2019/3/1
+ * Desc: base recycler adapter
  */
 public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseViewHolder> {
     /**
@@ -192,7 +191,7 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseVi
 
     /**
      * @param t
-     * @return 必须是布局文件的layout id
+     * @return must be the layout resource id
      */
     public abstract int getViewType(T t);
 
