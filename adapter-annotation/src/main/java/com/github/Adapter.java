@@ -14,10 +14,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface Adapter {
 
-    String data();
+    Class<?> dataClass() default String.class;
 
-    String[] viewHolderClassName();
+    Class<?>[] viewHolderClass() default {String.class};
 
     int[] layoutIds();
-
 }

@@ -10,6 +10,7 @@ import com.github.Adapter;
 import com.github.core.base.BaseRecyclerAdapter;
 import com.github.core.binder.SuperAdapter;
 import com.github.zengven.aptdemo.bean.NameBean;
+import com.github.zengven.aptdemo.holder.NameHolder;
 
 import java.util.ArrayList;
 
@@ -17,8 +18,8 @@ public class RecyclerActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    @Adapter(data = "NameBean",
-            viewHolderClassName = {"NameHolder", "NameHolder"},
+    @Adapter(dataClass = NameBean.class,
+            viewHolderClass = {NameHolder.class, NameHolder.class},
             layoutIds = {R.layout.simple_list_item_1, R.layout.simple_list_item_2})
     RecyclerView mRecyclerView;
 

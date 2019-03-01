@@ -21,7 +21,7 @@ public class NameHolder extends BaseViewHolder<NameBean> {
     }
 
     @Override
-    public void onBind(NameBean bean) {
+    public void onBind(final NameBean bean) {
         TextView textView = getView(R.id.text1);
         textView.setText(bean.name);
         textView.setOnClickListener(new View.OnClickListener() {

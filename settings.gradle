@@ -1,1 +1,1 @@
-include ':app', ':apt-annotation', ':apt-process', ':apt-core'
+include ':app', ':adapter-annotation', ':adapter-compiler', ':adapter-core'

@@ -26,7 +26,11 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -35,18 +39,16 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 @AutoService(Processor.class)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class AdapterProcessor extends AbstractProcessor {
     public static final String ADAPTERBINDER_SUFFIX = "$$AdapterBinder";
     public static final String ADAPTER_SUFFIX = "$$Adapter";
     private static final String ANDROID_BASE_PACKAGE = "android.view";
     private static final String ADAPTER_PACKAGE_SUFFIX = ".adapter";
-    private static final String HOLDER_PACKAGE_SUFFIX = ".holder";
     private static final String PACKAGE_CORE = "com.github.core.base"; //core 核心包名
     private static final String RECYCLER_TYPE_MIRROR_SUFFIX = "RecyclerView";
     private static final String LIST_TYPE_MIRROR_SUFFIX = "ListView";
     private static final String GRID_TYPE_MIRROR_SUFFIX = "GridView";
-    private String mHolderPackage;
-    private String mDataPath;
 
     private Messager mMessager;
     private Filer mFiler;
@@ -67,18 +69,6 @@ public class AdapterProcessor extends AbstractProcessor {
         mMessager = processingEnvironment.getMessager();
         mTypeUtils = processingEnvironment.getTypeUtils();
         mElementsUtils = processingEnvironment.getElementUtils();
-
-        // 设置holder 路径
-        Map<String, String> map = processingEnvironment.getOptions();
-        for (String key : map.keySet()) {
-            mMessager.printMessage(Diagnostic.Kind.NOTE, "key: " + key + " value: " + map.get(key));
-            if ("holderPath".equals(key)) {
-                mHolderPackage = map.get(key);
-            }
-            if ("dataPath".equals(key)) {
-                mDataPath = map.get(key);
-            }
-        }
     }
 
     @Override
@@ -156,10 +146,6 @@ public class AdapterProcessor extends AbstractProcessor {
         for (Element element : env.getElementsAnnotatedWith(Adapter.class)) {
             debug("SimpleName: " + element.getSimpleName() + "  TypeMirror: " + element.asType() + " ElementKind: " + element.getKind() + " binaryName: " + mElementsUtils.getBinaryName((TypeElement) element.getEnclosingElement()));
 
-            if (mHolderPackage == null || mHolderPackage.isEmpty()) {
-                mHolderPackage = getPackageName((TypeElement) element.getEnclosingElement()) + HOLDER_PACKAGE_SUFFIX;
-            }
-
             TypeMirror typeMirror = element.asType();
             if (typeMirror.toString().endsWith(RECYCLER_TYPE_MIRROR_SUFFIX)) {
                 parseRecyclerAdapter(typeSpecs, element);
@@ -192,8 +178,11 @@ public class AdapterProcessor extends AbstractProcessor {
                 .addStatement("mClassList=new $T<>()", ClassName.get(ArrayList.class))
                 .addStatement("mLayoutIds=new $T[$L]", int.class, adapter.layoutIds().length);
 
+        Map<? extends ExecutableElement, ? extends AnnotationValue> annotationMirror = ElementUtil.getAnnotationMirrors(element, Adapter.class);
+        AnnotationValue viewHolderClassAnnotationValue = ElementUtil.findAnnotationFieldValueByName(annotationMirror, "viewHolderClass");
+        List<? extends AnnotationValue> viewHolderClassTypeMirrors = (List<? extends AnnotationValue>) viewHolderClassAnnotationValue.getValue();
         for (int i = 0; i < adapter.layoutIds().length; i++) {
-            constructorMethodSpecBuilder.addStatement("mClassList.add($T.class)", ClassName.get(mHolderPackage, adapter.viewHolderClassName()[i]));
+            constructorMethodSpecBuilder.addStatement("mClassList.add($T.class)", ClassName.get((TypeMirror) viewHolderClassTypeMirrors.get(i).getValue()));
             constructorMethodSpecBuilder.addStatement("mLayoutIds[$L]=$L", i, adapter.layoutIds()[i]);
         }
         MethodSpec constructorMethodSpec = constructorMethodSpecBuilder.build();
@@ -219,11 +208,13 @@ public class AdapterProcessor extends AbstractProcessor {
                 .addStatement("return null")
                 .build();
 
+        AnnotationValue dataClassAnnotationValue = ElementUtil.findAnnotationFieldValueByName(annotationMirror, "dataClass");
+
         MethodSpec viewTypeMethodSpec = MethodSpec.methodBuilder("getViewType")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .returns(int.class)
-                .addParameter(ClassName.get(mDataPath, adapter.data()), "bean")
+                .addParameter(ClassName.get((TypeMirror) dataClassAnnotationValue.getValue()), "bean")
                 .addParameter(int.class, "position")
                 .beginControlFlow("if (mOnViewTypeListener == null)")
                 .addStatement("return $L", 0)
@@ -240,7 +231,7 @@ public class AdapterProcessor extends AbstractProcessor {
 
         TypeSpec typeSpec = TypeSpec.classBuilder(getAdapterClassName(element))
                 .addModifiers(Modifier.PUBLIC)
-                .superclass(ParameterizedTypeName.get(ClassName.get(PACKAGE_CORE, "BaseListAdapter"), ClassName.get(mDataPath, adapter.data())))
+                .superclass(ParameterizedTypeName.get(ClassName.get(PACKAGE_CORE, "BaseListAdapter"), ClassName.get((TypeMirror) dataClassAnnotationValue.getValue())))
                 .addMethod(constructorMethodSpec)
                 .addMethod(viewHolderMethodSpec)
                 .addMethod(viewTypeMethodSpec)
@@ -269,8 +260,12 @@ public class AdapterProcessor extends AbstractProcessor {
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("mClassMap=new $T<>()", ClassName.get(HashMap.class));
 
+        Map<? extends ExecutableElement, ? extends AnnotationValue> annotationMirror = ElementUtil.getAnnotationMirrors(element, Adapter.class);
+        AnnotationValue viewHolderClassAnnotationValue = ElementUtil.findAnnotationFieldValueByName(annotationMirror, "viewHolderClass");
+        List<? extends AnnotationValue> viewHolderClassTypeMirrors = (List<? extends AnnotationValue>) viewHolderClassAnnotationValue.getValue();
+
         for (int i = 0; i < adapter.layoutIds().length; i++) {
-            constructorMethodSpecBuilder.addStatement("mClassMap.put($L,$T.class)", adapter.layoutIds()[i], ClassName.get(mHolderPackage, adapter.viewHolderClassName()[i]));
+            constructorMethodSpecBuilder.addStatement("mClassMap.put($L,$T.class)", adapter.layoutIds()[i], ClassName.get((TypeMirror) viewHolderClassTypeMirrors.get(i).getValue()));
         }
         MethodSpec constructorMethodSpec = constructorMethodSpecBuilder.build();
 
@@ -295,11 +290,13 @@ public class AdapterProcessor extends AbstractProcessor {
                 .addStatement("return null")
                 .build();
 
+        AnnotationValue dataClassAnnotationValue = ElementUtil.findAnnotationFieldValueByName(annotationMirror, "dataClass");
+
         MethodSpec viewTypeMethodSpec = MethodSpec.methodBuilder("getViewType")
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
                 .returns(int.class)
-                .addParameter(ClassName.get(mDataPath, adapter.data()), "bean")
+                .addParameter(ClassName.get((TypeMirror) dataClassAnnotationValue.getValue()), "bean")
                 .beginControlFlow("if (mOnViewTypeListener == null)")
                 .addStatement("return $L", adapter.layoutIds()[0])
                 .endControlFlow()
@@ -308,7 +305,7 @@ public class AdapterProcessor extends AbstractProcessor {
 
         TypeSpec typeSpec = TypeSpec.classBuilder(getAdapterClassName(element))
                 .addModifiers(Modifier.PUBLIC)
-                .superclass(ParameterizedTypeName.get(ClassName.get(PACKAGE_CORE, "BaseRecyclerAdapter"), ClassName.get(mDataPath, adapter.data())))
+                .superclass(ParameterizedTypeName.get(ClassName.get(PACKAGE_CORE, "BaseRecyclerAdapter"), ClassName.get((TypeMirror) dataClassAnnotationValue.getValue())))
                 .addMethod(constructorMethodSpec)
                 .addMethod(viewHolderMethodSpec)
                 .addMethod(viewTypeMethodSpec)
